@@ -1,20 +1,16 @@
 function Whos-LoggedIn
 {
 	param
-	(
+    (
 		[String]$filter,
-		[String]$search,
-		[Switch]$unused,
-		[Switch]$moreInfo
+	  	[String]$search,
+	  	[Switch]$unused,
+	  	[Switch]$moreInfo
 	)
 	
 	$computers = get-adcomputer -filter * | where-object -property name -like $filter
-	if(get-command "Get-ComputerSite"){
-		$computerList | foreach-object{
-			$_ | Add-Member -MemberType NoteProperty -Name "Site" -Value (Get-ComputerSite -computerName ($PSItem.Name)) -Force
-		}
-	}
 	write-host $computers.count "computers to check"
+	#create concurrent stack allowing parallel execution of code later.
 	$computerList = [System.Collections.Concurrent.ConcurrentStack[object]]::new()
 
 	$hashFilter = @{
