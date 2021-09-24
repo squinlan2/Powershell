@@ -1,0 +1,28 @@
+
+    
+class IPAddress {
+    [Int]$firstOctet
+    [Int]$secondOctet
+    [Int]$thirdOctet
+    [Int]$fourthOctet
+
+    IPAddress([String]$ip){
+        $ipBreakdown = @()
+        $ipBreakdown = $ip.Split('.')
+        $this.firstOctet = $ipBreakdown[0]
+        $this.secondOctet = $ipBreakdown[1]
+        $this.thirdOctet = $ipBreakdown[2]
+        $this.fourthOctet = $ipBreakdown[3]      
+    }
+}
+
+class IPRange{
+    [IPAddress]$firstIPinRange
+    [IPAddress]$lastIPinRange
+
+    [boolean]isInRange([String]$ipAddress){
+        
+        
+        return $true
+    }
+}
