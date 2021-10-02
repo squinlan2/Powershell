@@ -14,10 +14,10 @@ function Whos-LoggedIn
 	$computerList = [System.Collections.Concurrent.ConcurrentStack[object]]::new()
 
 	$hashFilter = @{
-        LogName = 'Security'
-        StartTime = (Get-Date).addDays(-30)
-        ID = 4800, 4801, 4647
-    }
+        	LogName = 'Security'
+        	StartTime = (Get-Date).addDays(-30)
+        	ID = 4800, 4801, 4647
+    	}
 	
 	$computers | ForEach-Object -throttlelimit 20  -parallel{
 		$compList = $using:computerList
