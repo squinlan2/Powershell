@@ -1,0 +1,47 @@
+function convert-oldExcelFiles{
+    param()
+
+    #create File Picker Dialog to prompt for the folder containing old .xls files and store path
+    Add-Type -AssemblyName System.Windows.Forms
+    $FileBrowser = New-Object System.Windows.Forms.FolderBrowserDialog
+    $FileBrowser.ShowDialog()
+    $path = $FileBrowser.SelectedPath
+
+
+    $itterator = 1
+
+    #verify that the path exists. (should always exist since we use folder dialog.)
+    if(test-path $path){
+        #recursive query stores all .xls files
+        $list = get-childitem -Path $path -Attributes !Directory -Recurse | ? {$_.Extension -eq '.xls'}
+        
+        #open invisible excel instance
+        $excelApplication = New-Object -ComObject Excel.Application
+
+        #open the workbooks in the file list and save them with the newer format.
+        $list | ForEach-Object{
+            $workBook = $excelApplication.Workbooks.open($_.FullName)
+            write-host "Opened excel file: "$_.FullName
+            
+            #append "_newVersion" to old file name.
+            $newName = $_.baseName + "_newVersion.xlsx"
+            $saveAsPath = Join-Path -Path $_.Directory -ChildPath $newName
+            Write-Host $saveAsPath
+            $workBook.saveas("$saveAsPath", "51" )
+            
+            $excelApplication.Workbooks.close()
+            Write-Host "Closed excel file"
+            
+            #provide progress bar
+            $percentComplete = [math]::round(100 * ($itterator/$list.count), 1)
+            Write-Progress -Activity "Creating New Excel Files. $($percentComplete)% Complete" -Status $saveAsPath -PercentComplete $percentComplete
+            $itterator++
+        }
+
+        #close invisible excel instance
+        $excelApplication.quit()
+    }
+    else{
+        Write-Host "Path:" $path "not found."
+    }
+}
